@@ -1,0 +1,104 @@
+#!/usr/bin/php
+<?php
+
+require_once 'phplib/LineStats.php';
+
+$options = getopt(
+    'd:u:r:hsf',
+    [
+        'date:',
+        'user:',
+        'repo:',
+        'help',
+        'short',
+        'forever',
+    ]
+);
+
+$options_map = [
+    'd' => 'date',
+    'u' => 'user',
+    'r' => 'repo',
+    'h' => 'help',
+    's' => 'short',
+    'f' => 'forever',
+];
+
+// default to the longopts version of each option provided
+foreach ($options_map as $letter => $word) {
+    if (isset($options[$word]) && isset($options[$letter])) {
+        echo "you provided both -{$letter} and --{$word} options, will use: --{$word} {$options[$word]}\n";
+    } else if (!isset($options[$word]) && isset($options[$letter])) {
+        $options[$word] = $options[$letter];
+    }
+
+    unset($options[$letter]);
+}
+
+// can't have "since forever" and "since this specific date" set at the same time
+if (isset($options['forever']) && isset($options['date'])) {
+    echo "you provided both --forever and --date options, will use: --forever\n";
+    unset($options['date']);
+}
+
+if (isset($options['help'])) {
+    echo usage();
+    exit();
+}
+
+$is_short = isset($options['short']);
+
+if (isset($options['forever'])) {
+    $start_timestamp = 0;
+} else if (isset($options['date'])) {
+    $start_timestamp = strtotime($options['date']);
+} else {
+    $start_timestamp = strtotime('1 week ago');
+}
+
+if (isset($options['user'])) {
+    $user = $options['user'];
+} else {
+    $user = trim(shell_exec('whoami'));
+}
+
+$repo_path = !empty($options['repo']) ? $options['repo'] : null;
+$old_path = $repo_path ? getcwd() : null;
+
+if ($repo_path) {
+    chdir($repo_path);
+}
+
+$counter = new LineStats($user, $start_timestamp, $repo_path);
+
+if ($is_short) {
+    echo $counter->printShort();
+} else {
+    echo $counter->printLong();
+}
+
+if ($old_path) {
+    chdir($old_path);
+}
+
+function usage($additional_message = null) {
+    $header = 'line_stats [-d <date>] [-u <user_name>] [-sf] [-r <repo_directory>]';
+
+    if ($additional_message) {
+        $header = "{$additional_message}\n\n{$header}";
+    }
+
+    return <<<EOL
+{$header}
+
+Prints your line changes from the last week by default.
+
+-s, --short             Use a shorter output format.
+-d, --date ...          Start date, at day granularity. Any string you could pass to strtotime(). Defaults to 1 week ago.
+-u, --user ...          The user who changes to view. Defaults to \`whoami'
+-f, --forever           Look through all the commits of ALL TIME. Can't be combined with an explicit start date.
+-r, --repo              The directory of the git repo to use.
+-h, --help              Prints this usage message.
+
+EOL;
+}
