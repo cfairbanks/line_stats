@@ -7,7 +7,7 @@ class LineStats {
     private static $types = [
         'bash' => ['.sh'],
         'conf' => ['.conf'],
-        'css' => ['.css', '.scss'],
+        'css' => ['.css', '.scss', '.less'],
         'csv' => ['.csv'],
         'flash' => ['.swf'],
         'images' => ['.bmp', '.gif', '.ico', '.jpg', '.png', '.svg'],
