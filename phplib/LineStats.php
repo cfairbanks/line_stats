@@ -14,7 +14,7 @@ class LineStats {
         'htaccess' => ['.htaccess'],
         'html' => ['.htm', '.html'],
         'java' => ['.java'],
-        'js' => ['.js'],
+        'js' => ['.js', '.jsx'],
         'json' => ['.json'],
         'markdown' => ['.md'],
         'mustache' => ['.mustache'],
