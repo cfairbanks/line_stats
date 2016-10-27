@@ -51,9 +51,9 @@ $is_short = isset($options['short']);
 if (isset($options['forever'])) {
     $start_timestamp = 0;
 } else if (isset($options['date'])) {
-    $start_timestamp = strtotime($options['date']);
+    @$start_timestamp = strtotime($options['date']);
 } else {
-    $start_timestamp = strtotime('1 week ago');
+    @$start_timestamp = strtotime('1 week ago');
 }
 
 if (isset($options['user'])) {

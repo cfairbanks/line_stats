@@ -107,7 +107,7 @@ class LineStats {
 
         return sprintf(
             "%s\t%s\t%d\t%d\t%d\n",
-            $this->start_timestamp ? date('Y-m-d', $this->start_timestamp) : '',
+            @$this->start_timestamp ? date('Y-m-d', $this->start_timestamp) : '',
             $this->user_name,
             $this->total_added,
             $this->total_removed,
@@ -121,7 +121,7 @@ class LineStats {
     }
 
     private function formatLong() {
-        $time_output = $this->start_timestamp ? date('Y-m-d', $this->start_timestamp) : 'the beginning of time';
+        @$time_output = $this->start_timestamp ? date('Y-m-d', $this->start_timestamp) : 'the beginning of time';
 
         $output = "Changes by {$this->user_name} since {$time_output}:\n";
 
@@ -152,7 +152,7 @@ class LineStats {
     }
 
     private function run() {
-        $date_argument = $this->start_timestamp ? '--since ' . date('Y-m-d', $this->start_timestamp) : '';
+        @$date_argument = $this->start_timestamp ? '--since ' . date('Y-m-d', $this->start_timestamp) : '';
 
         $git_command = "git log --author='{$this->user_name}' --pretty=tformat: --numstat $date_argument";
 
